@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Poop Pay Calculator 💩</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      text-align: center;
+      background: #fefefe;
+      padding: 50px 20px;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #3e3e3e;
+      margin-bottom: 20px;
+    }
+
+    input, button, select {
+      padding: 12px 16px;
+      margin: 10px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    button {
+      background-color: #6c63ff;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #4e47d2;
+    }
+
+    #timer {
+      font-size: 2rem;
+      color: #6c63ff;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+
+    #results, #diagnosis {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      display: none;
+    }
+
+    #poopQualitySection {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .emoji-spin {
+      display: inline-block;
+      animation: spin 2s linear infinite;
+      font-size: 2rem;
+      margin-top: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>💩 Poop Pay Calculator</h1>
+
+  <label for="salary">Enter Your Annual Salary ($):</label><br>
+  <input type="number" id="salary" placeholder="e.g. 60000"><br>
+
+  <button onclick="startPoop()">Start Pooping</button>
+  <button onclick="stopPoop()">Stop Pooping</button>
+
+  <div id="timer">00:00</div>
+  <div class="emoji-spin" id="spinner" style="display: none;">💩</div>
+
+  <div id="results"></div>
+
+  <div id="poopQualitySection">
+    <label for="poopType">🧻 How was your pooping?</label><br>
+    <select id="poopType">
+      <option value="" disabled selected>Select stool type</option>
+      <option value="1">1: Separate hard lumps</option>
+      <option value="2">2: Lumpy sausage-like</option>
+      <option value="3">3: Sausage shape with cracks</option>
+      <option value="4">4: Smooth, soft sausage or snake</option>
+      <option value="5">5: Soft blobs with clear-cut edges</option>
+      <option value="6">6: Mushy consistency with ragged edges</option>
+      <option value="7">7: Liquid consistency with no solid pieces</option>
+    </select><br>
+    <button onclick="diagnose()">Diagnose 💡</button>
+  </div>
+
+  <div id="diagnosis"></div>
+
+  <script>
+    let startTime = null;
+    let timerInterval = null;
+
+    function formatTime(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+      const seconds = String(totalSeconds % 60).padStart(2, '0');
+      return `${minutes}:${seconds}`;
+    }
+
+    function updateTimer() {
+      const now = new Date();
+      const elapsed = now - startTime;
+      document.getElementById("timer").textContent = formatTime(elapsed);
+    }
+
+    function startPoop() {
+      const salary = parseFloat(document.getElementById("salary").value);
+      if (!salary || salary <= 0) {
+        alert("Please enter a valid salary.");
+        return;
+      }
+
+      startTime = new Date();
+      document.getElementById("spinner").style.display = "inline-block";
+      document.getElementById("timer").textContent = "00:00";
+      document.getElementById("results").style.display = "none";
+      document.getElementById("diagnosis").style.display = "none";
+      document.getElementById("poopQualitySection").style.display = "none";
+      document.getElementById("results").textContent = "";
+
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function stopPoop() {
+      if (!startTime) {
+        alert("You need to start pooping first!");
+        return;
+      }
+
+      clearInterval(timerInterval);
+      const endTime = new Date();
+      const durationMs = endTime - startTime;
+      const durationMinutes = durationMs / 60000;
+
+      const salary = parseFloat(document.getElementById("salary").value);
+      const hourlyRate = salary / (52 * 40);
+      const earnings = (hourlyRate / 60) * durationMinutes;
+
+      document.getElementById("results").innerHTML = `
+        ⏱ Time spent: ${durationMinutes.toFixed(2)} minutes<br>
+        💰 You earned: $${earnings.toFixed(2)} while pooping!
+      `;
+      document.getElementById("results").style.display = "block";
+      document.getElementById("spinner").style.display = "none";
+      document.getElementById("poopQualitySection").style.display = "block";
+
+      startTime = null;
+    }
+
+    function diagnose() {
+      const type = document.getElementById("poopType").value;
+      let message = "";
+
+      switch (type) {
+        case "1":
+          message = "🔴 Severe constipation";
+          break;
+        case "2":
+          message = "🟠 Normal constipation";
+          break;
+        case "3":
+          message = "🟡 Still within normal, but dry";
+          break;
+        case "4":
+          message = "🟢 Perfectly healthy poop!";
+          break;
+        case "5":
+          message = "🟠 Lacking dietary fiber";
+          break;
+        case "6":
+          message = "🔵 Mild diarrhea — hydrate!";
+          break;
+        case "7":
+          message = "🔴 Severe diarrhea — consider seeing a doctor";
+          break;
+        default:
+          message = "⚠️ Please select a poop type.";
+      }
+
+      const diagnosisDiv = document.getElementById("diagnosis");
+      diagnosisDiv.textContent = message;
+      diagnosisDiv.style.display = "block";
+    }
+  </script>
+
+</body>
+</html>
